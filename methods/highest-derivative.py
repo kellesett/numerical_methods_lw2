@@ -4,7 +4,7 @@ from math import *
 from equations import tests, tasks
 
 
-def finite_diff(p, q, f, left, right, ca1, ca2, n=20):
+def finite_diff(p, q, f, left, right, certain_cond1, certain_cond2, n=20):
     h = (right - left) / n
     A = np.zeros((n + 1,))
     B = np.zeros((n + 1,))
@@ -21,13 +21,13 @@ def finite_diff(p, q, f, left, right, ca1, ca2, n=20):
         B[i] = - 2 / h ** 2 + q(x[i])
         F[i] = f(x[i])
 
-    B[0] = ca1[1] * h - ca1[0]
-    C[0] = ca1[0]
-    F[0] = ca1[2] * h
+    B[0] = certain_cond1[1] * h - certain_cond1[0]
+    C[0] = certain_cond1[0]
+    F[0] = certain_cond1[2] * h
 
-    B[n] = ca2[1] * h + ca2[0]
-    A[n] = -ca2[0]
-    F[n] = ca2[2] * h
+    B[n] = certain_cond2[1] * h + certain_cond2[0]
+    A[n] = -certain_cond2[0]
+    F[n] = certain_cond2[2] * h
 
     aa[0] = -C[0] / B[0]
     bb[0] = F[0] / B[0]
@@ -40,10 +40,10 @@ def finite_diff(p, q, f, left, right, ca1, ca2, n=20):
         y[i - 1] = aa[i - 1] * y[i] + bb[i - 1]
     return x, y
 
-def test(eq: tests.TestDiffEquation, n: int) -> None:
+def test(eq: tests.TestDiffEqType2, n: int) -> None:
     fig, ax = plt.subplots()
 
-    x, y = finite_diff(eq.p, eq.q, eq.f, 0, 1, [1, -1, 0.6], [1, 1, 4 * exp(3) + exp(4)], n)
+    x, y = finite_diff(eq.p, eq.q, eq.f, eq.left, eq.right, eq.cc1, eq.cc2, n)
     plt.scatter(x, y, c='red', label='n = {}'.format(n))
 
     test_x = np.linspace(0, 1)
@@ -54,11 +54,11 @@ def test(eq: tests.TestDiffEquation, n: int) -> None:
     plt.show()
 
 
-def solve(eq: tasks.DiffEquation, n: int) -> None:
+def solve(eq: tasks.DiffEqType2, n: int) -> None:
     fig, ax = plt.subplots()
 
-    x, y = finite_diff(eq.p, eq.q, eq.f, 0, 1, [1, -1, 0.6], [1, 1, 4 * exp(3) + exp(4)], n)
-    plt.scatter(x, y, c='red', label='n = {}'.format(n))
+    x, y = finite_diff(eq.p, eq.q, eq.f, eq.left, eq.right, eq.cc1, eq.cc2, n)
+    ax.scatter(x, y, c='red', label='n = {}'.format(n))
 
     plt.legend(fontsize=12)
     plt.grid()
@@ -74,10 +74,10 @@ if __name__ == "__main__":
         n_loc = 30
     if ans == '1':
         print("Для завершения программы закройте выплывшее окно")
-        test(tests.test1, n_loc)
+        test(tests.type2_test1, n_loc)
     elif ans == '2':
         print("Для завершения программы закройте выплывшее окно")
-        solve(tasks.eq1, n_loc)
+        solve(tasks.type2_eq, n_loc)
     else:
         print("Ошибка ввода")
         exit(0)
