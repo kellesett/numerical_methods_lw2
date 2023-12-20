@@ -1,88 +1,83 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from math import *
+from equations import tests, tasks
 
 
-def p1(x):
-    return 1
+def finite_diff(p, q, f, left, right, ca1, ca2, n=20):
+    h = (right - left) / n
+    A = np.zeros((n + 1,))
+    B = np.zeros((n + 1,))
+    C = np.zeros((n + 1,))
+    F = np.zeros((n + 1,))
+    y = np.zeros((n + 1,))
+    aa = np.zeros((n + 1,))
+    bb = np.zeros((n + 1,))
 
+    x = np.array([left + h * i for i in range(n + 1)])
+    for i in range(n):
+        A[i] = 1 / h ** 2 - p(x[i]) / (2 * h)
+        C[i] = 1 / h ** 2 + p(x[i]) / (2 * h)
+        B[i] = - 2 / h ** 2 + q(x[i])
+        F[i] = f(x[i])
 
-def q1(x):
-    return 0
+    B[0] = ca1[1] * h - ca1[0]
+    C[0] = ca1[0]
+    F[0] = ca1[2] * h
 
+    B[n] = ca2[1] * h + ca2[0]
+    A[n] = -ca2[0]
+    F[n] = ca2[2] * h
 
-def f1(x):
-    return 3
+    aa[0] = -C[0] / B[0]
+    bb[0] = F[0] / B[0]
+    for i in range(1, n + 1):
+        aa[i] = -C[i] / (A[i] * aa[i - 1] + B[i])
+        bb[i] = (F[i] - A[i] * bb[i - 1]) / (A[i] * aa[i - 1] + B[i])
 
-
-def p3(x):
-    return 2
-
-
-def q3(x):
-    return -x
-
-
-def f3(x):
-    return x * x
-
-
-def sweep(p, q, f, a, b, ca1, ca2, n=20):
-    res = []
-    w = (b - a) / n
-    alpha = [0] * (n + 1)
-    alpha[1] = -(ca1[1] / (w * ca1[0] - ca1[1]))
-    betta = [0] * (n + 1)
-    betta[1] = ca1[2] / (ca1[0] - ca1[1] / w)
-    x = [0] * (n + 1)
-    x[0] = a
-    x[n] = b
-    y = [0] * (n + 1)
-    xdraw = [0] * (n + 1)
-    ydraw = [0] * (n + 1)
-    for i in range(1, n):
-        x[i] = x[i - 1] + w
-        c1 = 1 / w ** 2 - p(x[i]) / (2 * w)
-        c2 = 1 / w ** 2 + p(x[i]) / (2 * w)
-        c3 = -2 / w ** 2 + q(x[i])
-        alpha[i + 1] = -c2 / (c1 * alpha[i] + c3)
-        betta[i + 1] = (f(x[i]) - c1 * betta[i]) / (c1 * alpha[i] + c3)
-    y[n] = (ca2[1] * betta[n] + ca2[2] * w) / (ca2[1] * (1 - alpha[n]) + ca2[0] * w)
+    y[n] = (F[n] - bb[n - 1] * A[n]) / (B[n] + aa[n - 1] * A[n])
     for i in range(n, 0, -1):
-        y[i - 1] = y[i] * alpha[i] + betta[i]
-    for i in range(n + 1):
-        xdraw[i] = x[i]
-        ydraw[i] = y[i]
-        res.append((x[i], y[i]))
-    plt.scatter(xdraw, ydraw, c='red', label='n = ' + str(n))
-    return res
+        y[i - 1] = aa[i - 1] * y[i] + bb[i - 1]
+    return x, y
+
+def test(eq: tests.TestDiffEquation, n: int) -> None:
+    fig, ax = plt.subplots()
+
+    x, y = finite_diff(eq.p, eq.q, eq.f, 0, 1, [1, -1, 0.6], [1, 1, 4 * exp(3) + exp(4)], n)
+    plt.scatter(x, y, c='red', label='n = {}'.format(n))
+
+    test_x = np.linspace(0, 1)
+    test_y = [eq.solution(test_x[i]) for i in range(test_x.size)]
+    ax.plot(test_x, test_y, c='blue', label='y(x)')
+    plt.legend(fontsize=12)
+    plt.grid()
+    plt.show()
 
 
-question = input('Введите количество итераций: (для значений по умолчанию нажмите Enter)\n')
-n = 10
-if question:
-    n = int(question)
-res = sweep(p1, q1, f1, 0, 1, [1, 0, 0], [0, 1, 3], 20)
-length = len(res)
-for i in range(length):
-    print((res[i][0], res[i][1]), end="")
-    if i < length - 1:
-        print(', ', end="")
-print()
-x = np.linspace(0, 1)
-y = 3 * x
-plt.plot(x, y, c='blue', label='y(x)')
-plt.legend(fontsize=12)
-plt.grid(which='major')
-plt.show()
+def solve(eq: tasks.DiffEquation, n: int) -> None:
+    fig, ax = plt.subplots()
+
+    x, y = finite_diff(eq.p, eq.q, eq.f, 0, 1, [1, -1, 0.6], [1, 1, 4 * exp(3) + exp(4)], n)
+    plt.scatter(x, y, c='red', label='n = {}'.format(n))
+
+    plt.legend(fontsize=12)
+    plt.grid()
+    plt.show()
 
 
-res = sweep(p3, q3, f3, 0.6, 0.9, [0, 1, 0.7], [1, -0.5, 1], n)
-length = len(res)
-for i in range(length):
-    print((res[i][0], res[i][1]), end="")
-    if i < length - 1:
-        print(', ', end="")
-print()
-plt.legend(fontsize=12)
-plt.grid(which='major')
-plt.show()
+if __name__ == "__main__":
+    ans = input("Выберите режим работы:\n- (1) тестирование\n- (2) показать решения\n > ")
+    n_loc = input("Введите n; (Enter) для значения по умолчанию\n > ")
+    if n_loc:
+        n_loc = int(n_loc)
+    else:
+        n_loc = 30
+    if ans == '1':
+        print("Для завершения программы закройте выплывшее окно")
+        test(tests.test1, n_loc)
+    elif ans == '2':
+        print("Для завершения программы закройте выплывшее окно")
+        solve(tasks.eq1, n_loc)
+    else:
+        print("Ошибка ввода")
+        exit(0)
