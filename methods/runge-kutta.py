@@ -1,4 +1,3 @@
-from copy import deepcopy
 import matplotlib.pyplot as plt
 import numpy as np
 from math import *
@@ -57,28 +56,24 @@ def rk4(f, length, iterations: int, x0: float, y0: float):
     return x_lst, y_lst
 
 
-def system_rk2(funcs, w, n, x0, y0):
-    w = w / n
-    length = len(funcs)
-    res = [[x0, y0]]
-    x = [x0]
-    y1 = [y0[0]]
-    y2 = [y0[1]]
-    for i in range(n):
-        t1 = [0] * length
-        t2 = [0] * length
-        for j in range(length):
-            t1[j] = funcs[j](x0, y0[0], y0[1])
-            t2[j] = funcs[j](x0 + w, y0[0] + w * t1[j], y0[1] + w * t1[j])
-            y0[j] += (t1[j] + t2[j]) * w / 2
-        x0 += w
-        x.append(x0)
-        y1.append(y0[0])
-        y2.append(y0[1])
-        res.append([x0, deepcopy(y0)])
-    # plt.scatter(x, y1, c='green', label='u2')
-    # plt.scatter(x, y2, c='red', label='v2')
-    return x, y1, y2
+def system_rk2(funcs, length, iterations, x0, y0):
+    h = length / iterations
+    size = len(funcs)
+    x_lst, y_lst = np.zeros((iterations,)), np.zeros((2, iterations))
+    x, y = x0, y0
+
+    k1 = np.zeros((size,))
+    k2 = np.zeros((size,))
+    for i in range(iterations):
+        for j in range(size):
+            k1[j] = funcs[j](x, y[0], y[1])
+            k2[j] = funcs[j](x + h, y[0] + h * k1[j], y[1] + h * k1[j])
+            y[j]= y[j] + (k1[j] + k2[j]) * h / 2
+            y_lst[j][i] = y[j]
+
+        x += h
+        x_lst[i] = x
+    return x_lst, y_lst[0], y_lst[1]
 
 
 def system_rk4(funcs, length, iterations, x0, y0):
@@ -103,9 +98,6 @@ def system_rk4(funcs, length, iterations, x0, y0):
 
         x += h
         x_lst[i] = x
-
-    # plt.scatter(x, y_lst[0, :], c='magenta', label='f1_RK4')
-    # plt.scatter(x, y_lst[1, :], c='orange', label='f2_RK4')
     return x_lst, y_lst[0], y_lst[1]
 
 def test():
