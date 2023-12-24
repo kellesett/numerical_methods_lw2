@@ -40,3 +40,7 @@ system_eq = DiffEqSystem(lambda x, u, v: exp(-(u ** 2 + v ** 2)) + 2 * x,
 system_eq1 = DiffEqSystem(lambda x, u, v: cos(x + 1.5 * v) - u,
                                 lambda x, u, v: -v * v + 2.3 * u - 1.2,
                                 [0.25, 1], 0, 3)
+
+system_eq2 = DiffEqSystem(lambda x, u, v:  2.1 * v - u ** 2,
+                          lambda x, u, v: e ** (-u) + x + 2.1 * v,
+                          [1, 0.25], 0, 3)

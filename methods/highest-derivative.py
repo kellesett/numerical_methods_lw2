@@ -45,7 +45,7 @@ def test(eq: tests.TestDiffEqType2, n: int) -> None:
     x, y = finite_diff(eq.p, eq.q, eq.f, eq.left, eq.right, eq.cc1, eq.cc2, n)
     plt.scatter(x, y, c='red', label='n = {}'.format(n))
 
-    test_x = np.linspace(0, 1)
+    test_x = np.linspace(eq.left, eq.right)
     test_y = [eq.solution(test_x[i]) for i in range(test_x.size)]
     ax.plot(test_x, test_y, c='blue', label='y(x)')
     plt.legend(fontsize=12)
@@ -70,10 +70,10 @@ if __name__ == "__main__":
     if n_loc:
         n_loc = int(n_loc)
     else:
-        n_loc = 30
+        n_loc = 50
     if ans == '1':
         print("Для завершения программы закройте выплывшее окно")
-        test(tests.type2_test1, n_loc)
+        test(tests.type2_test2, n_loc)
     elif ans == '2':
         print("Для завершения программы закройте выплывшее окно")
         solve(tasks.type2_eq, n_loc)

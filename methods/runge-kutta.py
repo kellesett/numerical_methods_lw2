@@ -51,7 +51,7 @@ def system_rk2(eq, length, iterations, x0, y0):
     for i in range(iterations):
         for j in range(size):
             k1[j] = eq[j](x, y[0], y[1])
-            k2[j] = eq[j](x + h, y[0] + h * k1[j], y[1] + h * k1[j])
+            k2[j] = eq[j](x + h, y[0] + h * k1[0], y[1] + h * k1[1])
             y[j]= y[j] + (k1[j] + k2[j]) * h / 2
             y_lst[j][i] = y[j]
 
@@ -84,7 +84,7 @@ def system_rk4(eq, length, iterations, x0, y0):
         x_lst[i] = x
     return x_lst, y_lst[0], y_lst[1]
 
-def test(eq: tests.TestDiffEqType1, iterations=50):
+def test(eq: tests.TestDiffEqType1, iterations=30):
     fig, ax = plt.subplots()
 
     test_x = np.linspace(eq.left, eq.right)
@@ -92,10 +92,10 @@ def test(eq: tests.TestDiffEqType1, iterations=50):
     ax.plot(test_x, test_y, c='blue', label='y(x)')
     ax.set_xlabel(r'x', fontsize=12, loc="right")
     ax.set_ylabel(r'y(x)', fontsize=12, loc="top", rotation=0)
-    x, y = rk2(eq.f, eq.right - eq.left, iterations, eq.left, eq.cc)
-    ax.scatter(x, y, c='green', label='RK2', alpha=0.5)
+    x, y = rk2(eq.f, eq.right - eq.left, iterations * 2, eq.left, eq.cc)
+    ax.scatter(x, y, c='green', label='RK2')
     x, y = rk4(eq.f, eq.right - eq.left, iterations, eq.left, eq.cc)
-    ax.scatter(x, y, c='red', label='RK4', alpha=0.5)
+    ax.scatter(x, y, c='red', label='RK4')
 
     ax.set_title('RK2 & RK4 methods')
     ax.legend()
@@ -137,11 +137,11 @@ def solve_system(eq: tasks.DiffEqSystem, iterations=30):
     ax.set_xlabel(r'x', fontsize=12, loc="right")
     ax.set_ylabel(r'y(x)', fontsize=12, loc="top", rotation=0)
     x, y1, y2 = system_rk2(diff_eq, eq.right - eq.left, iterations, eq.left, eq.cc)
-    ax.scatter(x, y1, c='green', label='u_RK2', alpha=0.5)
-    ax.scatter(x, y2, c='blue', label='v_RK2', alpha=0.5)
+    ax.scatter(x, y1, c='green', label='u_RK2')
+    ax.scatter(x, y2, c='blue', label='v_RK2')
     x, y1, y2 = system_rk4(diff_eq, eq.right - eq.left, iterations, eq.left, eq.cc)
-    ax.scatter(x, y1, c='red', label='u_RK4', alpha=0.5)
-    ax.scatter(x, y2, c='orange', label='v_RK4', alpha=0.5)
+    ax.scatter(x, y1, c='red', label='u_RK4')
+    ax.scatter(x, y2, c='orange', label='v_RK4')
 
     ax.set_title('RK2 & RK4 methods')
     ax.legend(loc="lower left")
@@ -151,5 +151,5 @@ def solve_system(eq: tasks.DiffEqSystem, iterations=30):
     plt.show()
 
 if __name__ == "__main__":
-    test(tests.type1_test2, 50)
-    solve_system(tasks.system_eq, 1000)
+    test(tests.type1_test2)
+    test_system(tasks.system_eq2, 50)

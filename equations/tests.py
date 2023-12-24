@@ -25,6 +25,14 @@ type2_test1 = TestDiffEqType2(lambda x: -2,
                               lambda x: exp(-x) + exp(3 * x) + 0.2 * exp(4 * x),
                               0, 1)
 
+type2_test2 = TestDiffEqType2(lambda x: 0,
+                              lambda x: -1,
+                              lambda x: 0,
+                              [-1, 1, 0],
+                              [0, 1, 2],
+                              lambda x: 2 * exp(x),
+                              -1, 0)
+
 type1_test1 = TestDiffEqType1(lambda x, y: (x - x * x) * y,
                               1,0, 1,
                               lambda x: e ** ((-1 / 6) * x * x * (-3 + 2 * x)))
